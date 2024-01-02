@@ -6,7 +6,6 @@
 
 use core::panic::PanicInfo;
 use rust_os::println;
-use rust_os::vga_buffer;
 
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
@@ -16,11 +15,6 @@ pub extern "C" fn _start() -> ! {
     println!("Hello World {}", "!");
 
     rust_os::init();
-
-    // trigger a page fault
-    unsafe {
-        *(0xdeadbeef as *mut u8) = 42;
-    };
 
     #[cfg(test)]
     test_main();
@@ -34,6 +28,8 @@ pub extern "C" fn _start() -> ! {
 #[cfg(not(test))]
 #[panic_handler]
 fn panic_handler(info: &PanicInfo) -> ! {
+    use rust_os::vga_buffer;
+
     vga_buffer::set_print_color(vga_buffer::ColorCode::new(
         vga_buffer::Color::LightRed,
         vga_buffer::Color::Black,
