@@ -90,7 +90,7 @@ impl Writer {
         }
     }
 
-    pub fn setColor(&mut self, color_code: ColorCode) {
+    pub fn set_color(&mut self, color_code: ColorCode) {
         self.color_code = color_code;
     }
 
@@ -130,8 +130,8 @@ lazy_static! {
     });
 }
 
-pub fn setPrintColor(color_code: ColorCode) {
-    WRITER.lock().setColor(color_code);
+pub fn set_print_color(color_code: ColorCode) {
+    WRITER.lock().set_color(color_code);
 }
 
 #[macro_export]
@@ -149,4 +149,29 @@ macro_rules! println {
 pub fn _print(args: fmt::Arguments) {
     use core::fmt::Write;
     WRITER.lock().write_fmt(args).unwrap();
+}
+
+// Tests
+
+#[test_case]
+fn test_println_simple() {
+    println!("test_println_simple output");
+}
+
+#[test_case]
+fn test_println_many() {
+    for _ in 0..200 {
+        println!("test_println_many output");
+    }
+}
+
+#[test_case]
+fn test_println_output() {
+    let s = "Some string that fits on a single line";
+    println!("{}", s);
+
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+        assert_eq!(char::from(screen_char.ascii_character), c)
+    }
 }
