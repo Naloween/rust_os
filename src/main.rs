@@ -5,7 +5,7 @@
 #![reexport_test_harness_main = "test_main"]
 
 use core::panic::PanicInfo;
-use rust_os::println;
+use rust_os::{print, println};
 
 #[no_mangle] // don't mangle the name of this function
 pub extern "C" fn _start() -> ! {
@@ -21,7 +21,7 @@ pub extern "C" fn _start() -> ! {
 
     println!("It did not crash!");
 
-    loop {}
+    rust_os::hlt_loop();
 }
 
 /// This function is called on panic.
@@ -35,7 +35,7 @@ fn panic_handler(info: &PanicInfo) -> ! {
         vga_buffer::Color::Black,
     ));
     println!("{}", info);
-    loop {}
+    rust_os::hlt_loop();
 }
 
 #[cfg(test)]
